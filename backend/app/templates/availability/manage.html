@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">Manage Availability</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('main.dashboard') }}" class="text-gray-600 hover:text-gray-800">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="bg-white shadow rounded-lg">
+                <div class="p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Set Your Weekly Availability</h2>
+                    <form method="POST" class="space-y-6">
+                        {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        {% for i in range(7) %}
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 items-center">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">{{ days[i] }}</label>
+                                </div>
+                                <div>
+                                    <label for="start_time_{{ i }}" class="block text-sm font-medium text-gray-700">Start Time</label>
+                                    <select name="start_time_{{ i }}" id="start_time_{{ i }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Not Available</option>
+                                        {% for hour in range(9, 21) %}
+                                            <option value="{{ '%02d:00' % hour }}" {% if availabilities.get(i) and availabilities[i].start_time.strftime('%H:%M') == '%02d:00' % hour %}selected{% endif %}>{{ '%02d:00' % hour }}</option>
+                                            <option value="{{ '%02d:30' % hour }}" {% if availabilities.get(i) and availabilities[i].start_time.strftime('%H:%M') == '%02d:30' % hour %}selected{% endif %}>{{ '%02d:30' % hour }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="end_time_{{ i }}" class="block text-sm font-medium text-gray-700">End Time</label>
+                                    <select name="end_time_{{ i }}" id="end_time_{{ i }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">Not Available</option>
+                                        {% for hour in range(9, 22) %}
+                                            <option value="{{ '%02d:00' % hour }}" {% if availabilities.get(i) and availabilities[i].end_time.strftime('%H:%M') == '%02d:00' % hour %}selected{% endif %}>{{ '%02d:00' % hour }}</option>
+                                            <option value="{{ '%02d:30' % hour }}" {% if availabilities.get(i) and availabilities[i].end_time.strftime('%H:%M') == '%02d:30' % hour %}selected{% endif %}>{{ '%02d:30' % hour }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="mt-6">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Save Availability
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
